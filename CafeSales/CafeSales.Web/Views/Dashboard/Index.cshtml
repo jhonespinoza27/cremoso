@@ -1,0 +1,130 @@
+@model DashboardViewModel
+@{ ViewData["Title"] = "Dashboard"; }
+
+<div class="kpi-grid">
+    <div class="kpi-card">
+        <div class="kpi-icon primary"><i class="bi bi-cart-check"></i></div>
+        <div>
+            <div class="kpi-value">@Model.VentasHoy</div>
+            <div class="kpi-label">Ventas Hoy</div>
+        </div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-icon success"><i class="bi bi-cash-stack"></i></div>
+        <div>
+            <div class="kpi-value">$@Model.IngresosHoy.ToString("N2")</div>
+            <div class="kpi-label">Ingresos Hoy</div>
+        </div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-icon info"><i class="bi bi-calendar-month"></i></div>
+        <div>
+            <div class="kpi-value">$@Model.IngresosMes.ToString("N2")</div>
+            <div class="kpi-label">Ingresos del Mes</div>
+        </div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-icon warning"><i class="bi bi-exclamation-triangle"></i></div>
+        <div>
+            <div class="kpi-value">@Model.ProductosBajoStock</div>
+            <div class="kpi-label">Bajo Stock (&le;10)</div>
+        </div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-icon primary"><i class="bi bi-cup-hot"></i></div>
+        <div>
+            <div class="kpi-value">@Model.TotalProductos</div>
+            <div class="kpi-label">Productos Activos</div>
+        </div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-icon info"><i class="bi bi-people"></i></div>
+        <div>
+            <div class="kpi-value">@Model.TotalClientes</div>
+            <div class="kpi-label">Clientes</div>
+        </div>
+    </div>
+</div>
+
+<div class="grid-2">
+    <!-- Productos más vendidos del mes -->
+    <div class="card">
+        <div class="card-header d-flex align-items-center justify-content-between">
+            <span><i class="bi bi-trophy me-1"></i> Productos Más Vendidos (Mes)</span>
+        </div>
+        <div class="card-body" style="padding: 0;">
+            @if (Model.ProductosPopulares.Any())
+            {
+                <table class="table mb-0">
+                    <thead>
+                        <tr>
+                            <th>Producto</th>
+                            <th class="text-end">Cantidad</th>
+                            <th class="text-end">Ingresos</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var p in Model.ProductosPopulares)
+                        {
+                            <tr>
+                                <td class="fw-semibold">@p.Nombre</td>
+                                <td class="text-end">@p.CantidadVendida</td>
+                                <td class="text-end fw-bold">$@p.Ingresos.ToString("N2")</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+            else
+            {
+                <div class="empty-state">
+                    <i class="bi bi-inbox"></i>
+                    <h5>Sin ventas este mes</h5>
+                    <p>Registra tu primera venta para ver estadísticas aquí.</p>
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- Ventas recientes -->
+    <div class="card">
+        <div class="card-header d-flex align-items-center justify-content-between">
+            <span><i class="bi bi-clock-history me-1"></i> Ventas Recientes</span>
+            <a asp-controller="Venta" asp-action="Index" class="btn btn-sm btn-secondary">Ver todas</a>
+        </div>
+        <div class="card-body" style="padding: 0;">
+            @if (Model.VentasRecientes.Any())
+            {
+                <table class="table mb-0">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Cliente</th>
+                            <th>Vendedor</th>
+                            <th class="text-end">Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var v in Model.VentasRecientes)
+                        {
+                            <tr>
+                                <td><span class="badge badge-primary">#@v.VentaId</span></td>
+                                <td>@v.Cliente</td>
+                                <td class="text-muted">@v.Vendedor</td>
+                                <td class="text-end fw-bold">$@v.Total.ToString("N2")</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+            else
+            {
+                <div class="empty-state">
+                    <i class="bi bi-inbox"></i>
+                    <h5>Sin ventas aún</h5>
+                    <p>Las ventas recientes aparecerán aquí.</p>
+                </div>
+            }
+        </div>
+    </div>
+</div>

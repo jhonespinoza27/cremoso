@@ -1,0 +1,79 @@
+@model ReporteVentasViewModel
+@{ ViewData["Title"] = "Ventas por Período"; }
+
+<form method="get" class="filter-bar">
+    <div>
+        <label class="form-label mb-0">Desde</label>
+        <input type="date" name="fechaInicio" class="form-control" value="@Model.FechaInicio.ToString("yyyy-MM-dd")" />
+    </div>
+    <div>
+        <label class="form-label mb-0">Hasta</label>
+        <input type="date" name="fechaFin" class="form-control" value="@Model.FechaFin.ToString("yyyy-MM-dd")" />
+    </div>
+    <div style="padding-top: 20px;">
+        <button type="submit" class="btn btn-primary btn-sm"><i class="bi bi-search"></i> Consultar</button>
+    </div>
+</form>
+
+<div class="kpi-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); margin-bottom: 20px;">
+    <div class="kpi-card">
+        <div class="kpi-icon primary"><i class="bi bi-receipt"></i></div>
+        <div>
+            <div class="kpi-value">@Model.TotalVentas</div>
+            <div class="kpi-label">Total Ventas</div>
+        </div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-icon success"><i class="bi bi-cash-stack"></i></div>
+        <div>
+            <div class="kpi-value">$@Model.TotalGeneral.ToString("N2")</div>
+            <div class="kpi-label">Ingresos Totales</div>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body" style="padding: 0;">
+        @if (Model.Ventas.Any())
+        {
+            <div class="table-responsive">
+                <table class="table mb-0">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Fecha</th>
+                            <th>Cliente</th>
+                            <th>Vendedor</th>
+                            <th class="text-end">Productos</th>
+                            <th class="text-end">Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var v in Model.Ventas)
+                        {
+                            <tr>
+                                <td><span class="badge badge-primary">#@v.VentaId</span></td>
+                                <td>@v.Fecha.ToString("dd/MM/yyyy HH:mm")</td>
+                                <td>@v.Cliente</td>
+                                <td class="text-muted">@v.Vendedor</td>
+                                <td class="text-end">@v.CantidadProductos</td>
+                                <td class="text-end fw-bold">$@v.Total.ToString("N2")</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <div class="empty-state">
+                <i class="bi bi-inbox"></i>
+                <h5>Sin ventas en este período</h5>
+            </div>
+        }
+    </div>
+</div>
+
+<div class="mt-3">
+    <a asp-action="Index" class="btn btn-secondary"><i class="bi bi-arrow-left"></i> Volver a Reportes</a>
+</div>

@@ -1,0 +1,47 @@
+@model LoginViewModel
+@{
+    ViewData["Title"] = "Iniciar Sesión";
+    Layout = "_Layout";
+}
+
+<div class="login-page">
+    <div class="login-container">
+        <div class="login-card">
+            <div class="login-logo">
+                <div class="logo-circle">☕</div>
+                <h2>CafeCremoso</h2>
+                <p>Sistema de Ventas de Cafetería</p>
+            </div>
+
+            <div asp-validation-summary="All" class="alert alert-danger" style="display: @(ViewData.ModelState.ErrorCount > 0 ? "flex" : "none")">
+                <i class="bi bi-exclamation-circle-fill"></i>
+            </div>
+
+            <form asp-action="Login" method="post">
+                <div class="form-group">
+                    <label asp-for="Usuario" class="form-label">
+                        <i class="bi bi-person me-1"></i> Usuario
+                    </label>
+                    <input asp-for="Usuario" class="form-control" placeholder="Ingrese su usuario" autofocus />
+                    <span asp-validation-for="Usuario"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="Password" class="form-label">
+                        <i class="bi bi-lock me-1"></i> Contraseña
+                    </label>
+                    <input asp-for="Password" class="form-control" placeholder="Ingrese su contraseña" />
+                    <span asp-validation-for="Password"></span>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-lg w-100 mt-2">
+                    <i class="bi bi-box-arrow-in-right"></i> Ingresar
+                </button>
+            </form>
+
+            <p class="text-center text-muted mt-3" style="font-size: 0.8rem;">
+                CafeCremoso · Sistema de Ventas de Cafetería
+            </p>
+        </div>
+    </div>
+</div>

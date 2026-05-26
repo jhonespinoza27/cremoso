@@ -1,0 +1,58 @@
+@model IEnumerable<Usuario>
+@{
+    ViewData["Title"] = "Usuarios";
+    ViewData["HeaderAction"] = "<a href='/Usuario/Crear' class='btn btn-primary btn-sm'><i class='bi bi-plus-lg'></i> Nuevo Usuario</a>";
+}
+
+<div class="card">
+    <div class="card-body" style="padding: 0;">
+        <div class="table-responsive">
+            <table class="table mb-0">
+                <thead>
+                    <tr>
+                        <th>Usuario</th>
+                        <th>Nombre Completo</th>
+                        <th>Rol</th>
+                        <th>Estado</th>
+                        <th>Fecha Creación</th>
+                        <th class="text-end">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var u in Model)
+                    {
+                        <tr>
+                            <td class="fw-semibold">@u.NombreUsuario</td>
+                            <td>@(u.NombreCompleto ?? "—")</td>
+                            <td>
+                                <span class="badge @(u.Rol.Nombre == "Administrador" ? "badge-warning" : "badge-info")">
+                                    @u.Rol.Nombre
+                                </span>
+                            </td>
+                            <td>
+                                <span class="badge @(u.Activo ? "badge-success" : "badge-danger")">
+                                    @(u.Activo ? "Activo" : "Inactivo")
+                                </span>
+                            </td>
+                            <td class="text-muted">@u.FechaCreacion.ToString("dd/MM/yyyy")</td>
+                            <td class="text-end">
+                                <a asp-action="Editar" asp-route-id="@u.UsuarioId" class="btn btn-sm btn-secondary" title="Editar">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                @if (u.UsuarioId != 1)
+                                {
+                                    <form asp-action="Eliminar" asp-route-id="@u.UsuarioId" method="post" style="display:inline;"
+                                          onsubmit="return confirm('¿Desactivar este usuario?');">
+                                        <button type="submit" class="btn btn-sm btn-danger" title="Desactivar">
+                                            <i class="bi bi-person-x"></i>
+                                        </button>
+                                    </form>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,191 @@
+@model VentaViewModel
+@{
+    ViewData["Title"] = "Registrar Venta";
+    var productos = ViewBag.Productos as IEnumerable<Producto>;
+}
+
+<div asp-validation-summary="All" class="alert alert-danger" style="display: @(ViewData.ModelState.ErrorCount > 0 ? "flex" : "none")">
+    <i class="bi bi-exclamation-circle-fill"></i>
+</div>
+
+<form asp-action="Registrar" method="post" id="ventaForm">
+    <div class="grid-2">
+        <!-- Panel izquierdo: Selección de productos -->
+        <div class="card">
+            <div class="card-header"><i class="bi bi-cup-hot me-1"></i> Agregar Productos</div>
+            <div class="card-body">
+                <div class="form-group">
+                    <label class="form-label">Producto</label>
+                    <select id="productoSelect" class="form-select">
+                        <option value="">-- Seleccione un producto --</option>
+                        @if (productos != null)
+                        {
+                            @foreach (var p in productos)
+                            {
+                                <option value="@p.ProductoId"
+                                        data-nombre="@p.Nombre"
+                                        data-precio="@p.Precio"
+                                        data-stock="@p.Stock">
+                                    @p.Nombre — $@p.Precio.ToString("N2") (Stock: @p.Stock)
+                                </option>
+                            }
+                        }
+                    </select>
+                </div>
+                <div class="d-flex gap-2 align-items-center">
+                    <div class="form-group" style="flex:1; margin-bottom:0;">
+                        <label class="form-label">Cantidad</label>
+                        <input type="number" id="cantidadInput" class="form-control" value="1" min="1" />
+                    </div>
+                    <div style="padding-top: 24px;">
+                        <button type="button" class="btn btn-success" onclick="agregarProducto()">
+                            <i class="bi bi-plus-lg"></i> Agregar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Panel derecho: Datos de la venta -->
+        <div class="card">
+            <div class="card-header"><i class="bi bi-receipt me-1"></i> Datos de la Venta</div>
+            <div class="card-body">
+                <div class="form-group">
+                    <label asp-for="ClienteId" class="form-label"></label>
+                    <select asp-for="ClienteId" class="form-select" asp-items="@((SelectList)ViewBag.Clientes)">
+                        <option value="">-- Seleccione un cliente --</option>
+                    </select>
+                    <span asp-validation-for="ClienteId" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Observacion" class="form-label"></label>
+                    <textarea asp-for="Observacion" class="form-control" rows="2" placeholder="Observaciones opcionales"></textarea>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Carrito de productos -->
+    <div class="card mt-3">
+        <div class="card-header d-flex align-items-center justify-content-between">
+            <span><i class="bi bi-cart3 me-1"></i> Detalle de la Venta</span>
+            <div class="cart-total" id="totalDisplay">Total: $0.00</div>
+        </div>
+        <div class="card-body" style="padding: 0;">
+            <div class="table-responsive">
+                <table class="table cart-table mb-0">
+                    <thead>
+                        <tr>
+                            <th>Producto</th>
+                            <th class="text-end">Precio Unit.</th>
+                            <th class="text-end">Cantidad</th>
+                            <th class="text-end">Subtotal</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody id="cartBody">
+                        <tr id="emptyRow">
+                            <td colspan="5" class="text-center text-muted" style="padding: 40px;">
+                                <i class="bi bi-cart" style="font-size: 1.5rem;"></i><br />
+                                Agregue productos a la venta
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="d-flex gap-2 mt-3 justify-content-between">
+        <a asp-action="Index" class="btn btn-secondary"><i class="bi bi-arrow-left"></i> Cancelar</a>
+        <button type="submit" class="btn btn-primary btn-lg" id="btnConfirmar" disabled>
+            <i class="bi bi-check-circle"></i> Confirmar Venta
+        </button>
+    </div>
+</form>
+
+@section Scripts {
+<script>
+    let cartItems = [];
+    let itemIndex = 0;
+
+    function agregarProducto() {
+        const select = document.getElementById('productoSelect');
+        const cantidadInput = document.getElementById('cantidadInput');
+        const option = select.options[select.selectedIndex];
+
+        if (!option.value) { alert('Seleccione un producto.'); return; }
+
+        const productoId = parseInt(option.value);
+        const nombre = option.dataset.nombre;
+        const precio = parseFloat(option.dataset.precio);
+        const stock = parseInt(option.dataset.stock);
+        const cantidad = parseInt(cantidadInput.value);
+
+        if (cantidad <= 0) { alert('La cantidad debe ser mayor a 0.'); return; }
+        if (cantidad > stock) { alert(`Stock insuficiente. Disponible: ${stock}`); return; }
+
+        // Check if product already in cart
+        const existing = cartItems.findIndex(i => i.productoId === productoId);
+        if (existing >= 0) {
+            cartItems[existing].cantidad += cantidad;
+            if (cartItems[existing].cantidad > stock) {
+                cartItems[existing].cantidad = stock;
+                alert(`Stock máximo: ${stock}`);
+            }
+        } else {
+            cartItems.push({ productoId, nombre, precio, cantidad, idx: itemIndex++ });
+        }
+
+        renderCart();
+        select.value = '';
+        cantidadInput.value = 1;
+    }
+
+    function removeItem(idx) {
+        cartItems = cartItems.filter(i => i.idx !== idx);
+        renderCart();
+    }
+
+    function renderCart() {
+        const tbody = document.getElementById('cartBody');
+        const emptyRow = document.getElementById('emptyRow');
+        const totalDisplay = document.getElementById('totalDisplay');
+        const btnConfirmar = document.getElementById('btnConfirmar');
+
+        // Remove all except hidden inputs
+        tbody.innerHTML = '';
+
+        if (cartItems.length === 0) {
+            tbody.innerHTML = `<tr id="emptyRow"><td colspan="5" class="text-center text-muted" style="padding:40px;">
+                <i class="bi bi-cart" style="font-size:1.5rem;"></i><br/>Agregue productos a la venta</td></tr>`;
+            totalDisplay.textContent = 'Total: $0.00';
+            btnConfirmar.disabled = true;
+            return;
+        }
+
+        let total = 0;
+        cartItems.forEach((item, i) => {
+            const subtotal = item.precio * item.cantidad;
+            total += subtotal;
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td class="fw-semibold">${item.nombre}
+                    <input type="hidden" name="Detalles[${i}].ProductoId" value="${item.productoId}" />
+                    <input type="hidden" name="Detalles[${i}].NombreProducto" value="${item.nombre}" />
+                    <input type="hidden" name="Detalles[${i}].PrecioUnit" value="${item.precio}" />
+                    <input type="hidden" name="Detalles[${i}].Cantidad" value="${item.cantidad}" />
+                </td>
+                <td class="text-end">$${item.precio.toFixed(2)}</td>
+                <td class="text-end">${item.cantidad}</td>
+                <td class="text-end fw-bold">$${subtotal.toFixed(2)}</td>
+                <td><button type="button" class="btn-remove" onclick="removeItem(${item.idx})"><i class="bi bi-x-circle"></i></button></td>
+            `;
+            tbody.appendChild(row);
+        });
+
+        totalDisplay.textContent = `Total: $${total.toFixed(2)}`;
+        btnConfirmar.disabled = false;
+    }
+</script>
+}

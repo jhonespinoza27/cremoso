@@ -1,0 +1,25 @@
+@{ ViewData["Title"] = "Reportes"; }
+
+<div class="kpi-grid" style="grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));">
+    <a asp-action="PorPeriodo" class="kpi-card" style="text-decoration: none; color: inherit;">
+        <div class="kpi-icon primary"><i class="bi bi-calendar-range"></i></div>
+        <div>
+            <div class="fw-bold" style="font-size: 1.1rem;">Ventas por Período</div>
+            <div class="kpi-label">Consulte las ventas por rango de fechas</div>
+        </div>
+    </a>
+    <a asp-action="ProductosMasVendidos" class="kpi-card" style="text-decoration: none; color: inherit;">
+        <div class="kpi-icon success"><i class="bi bi-trophy"></i></div>
+        <div>
+            <div class="fw-bold" style="font-size: 1.1rem;">Productos Más Vendidos</div>
+            <div class="kpi-label">Ranking de productos por cantidad vendida</div>
+        </div>
+    </a>
+    <a asp-action="PorVendedor" class="kpi-card" style="text-decoration: none; color: inherit;">
+        <div class="kpi-icon info"><i class="bi bi-person-badge"></i></div>
+        <div>
+            <div class="fw-bold" style="font-size: 1.1rem;">Ingresos por Vendedor</div>
+            <div class="kpi-label">Rendimiento de cada vendedor</div>
+        </div>
+    </a>
+</div>

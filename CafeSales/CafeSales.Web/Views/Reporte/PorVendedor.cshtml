@@ -1,0 +1,65 @@
+@model ReporteVendedoresViewModel
+@{ ViewData["Title"] = "Ingresos por Vendedor"; }
+
+<form method="get" class="filter-bar">
+    <div>
+        <label class="form-label mb-0">Desde</label>
+        <input type="date" name="fechaInicio" class="form-control" value="@Model.FechaInicio.ToString("yyyy-MM-dd")" />
+    </div>
+    <div>
+        <label class="form-label mb-0">Hasta</label>
+        <input type="date" name="fechaFin" class="form-control" value="@Model.FechaFin.ToString("yyyy-MM-dd")" />
+    </div>
+    <div style="padding-top: 20px;">
+        <button type="submit" class="btn btn-primary btn-sm"><i class="bi bi-search"></i> Consultar</button>
+    </div>
+</form>
+
+<div class="card">
+    <div class="card-body" style="padding: 0;">
+        @if (Model.Vendedores.Any())
+        {
+            <div class="table-responsive">
+                <table class="table mb-0">
+                    <thead>
+                        <tr>
+                            <th>Vendedor</th>
+                            <th class="text-end">Total Ventas</th>
+                            <th class="text-end">Total Ingresos</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var v in Model.Vendedores)
+                        {
+                            <tr>
+                                <td class="fw-semibold">
+                                    <i class="bi bi-person-badge me-1 text-primary"></i> @v.NombreVendedor
+                                </td>
+                                <td class="text-end"><span class="badge badge-info">@v.TotalVentas ventas</span></td>
+                                <td class="text-end fw-bold" style="font-size:1.05rem;">$@v.TotalIngresos.ToString("N2")</td>
+                            </tr>
+                        }
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td class="fw-bold">TOTAL</td>
+                            <td class="text-end fw-bold">@Model.Vendedores.Sum(v => v.TotalVentas) ventas</td>
+                            <td class="text-end fw-bold cart-total">$@Model.Vendedores.Sum(v => v.TotalIngresos).ToString("N2")</td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        }
+        else
+        {
+            <div class="empty-state">
+                <i class="bi bi-inbox"></i>
+                <h5>Sin datos en este período</h5>
+            </div>
+        }
+    </div>
+</div>
+
+<div class="mt-3">
+    <a asp-action="Index" class="btn btn-secondary"><i class="bi bi-arrow-left"></i> Volver a Reportes</a>
+</div>

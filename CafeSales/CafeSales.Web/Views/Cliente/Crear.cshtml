@@ -1,0 +1,40 @@
+@model Cliente
+@{ ViewData["Title"] = "Nuevo Cliente"; }
+
+<div style="max-width: 600px;">
+    <div class="card">
+        <div class="card-header"><i class="bi bi-person-plus me-1"></i> Registrar Cliente</div>
+        <div class="card-body">
+            <form asp-action="Crear" method="post">
+                <div class="form-group">
+                    <label asp-for="Nombre" class="form-label"></label>
+                    <input asp-for="Nombre" class="form-control" placeholder="Nombre completo" />
+                    <span asp-validation-for="Nombre" class="text-danger"></span>
+                </div>
+                <div class="d-flex gap-2">
+                    <div class="form-group" style="flex:1;">
+                        <label asp-for="Documento" class="form-label"></label>
+                        <input asp-for="Documento" class="form-control" placeholder="DNI o RUC" />
+                    </div>
+                    <div class="form-group" style="flex:1;">
+                        <label asp-for="Telefono" class="form-label"></label>
+                        <input asp-for="Telefono" class="form-control" placeholder="Teléfono" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Correo" class="form-label"></label>
+                    <input asp-for="Correo" class="form-control" type="email" placeholder="correo@ejemplo.com" />
+                    <span asp-validation-for="Correo" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Direccion" class="form-label"></label>
+                    <input asp-for="Direccion" class="form-control" placeholder="Dirección" />
+                </div>
+                <div class="d-flex gap-2 mt-3">
+                    <button type="submit" class="btn btn-primary"><i class="bi bi-check-lg"></i> Guardar</button>
+                    <a asp-action="Index" class="btn btn-secondary"><i class="bi bi-arrow-left"></i> Cancelar</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

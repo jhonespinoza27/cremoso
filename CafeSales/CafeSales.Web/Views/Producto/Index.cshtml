@@ -1,0 +1,98 @@
+@model IEnumerable<Producto>
+@{
+    ViewData["Title"] = "Productos";
+    ViewData["HeaderAction"] = User.IsInRole("Administrador")
+        ? "<a href='/Producto/Crear' class='btn btn-primary btn-sm'><i class='bi bi-plus-lg'></i> Nuevo Producto</a>"
+        : "";
+}
+
+<form method="get" class="filter-bar">
+    <input type="text" name="busqueda" class="form-control" placeholder="Buscar producto..." value="@ViewBag.Busqueda" />
+    <select name="categoriaId" class="form-select" style="max-width: 200px;">
+        <option value="">Todas las categorías</option>
+        @foreach (var item in (SelectList)ViewBag.Categorias)
+        {
+            <option value="@item.Value" selected="@item.Selected">@item.Text</option>
+        }
+    </select>
+    <button type="submit" class="btn btn-primary btn-sm"><i class="bi bi-search"></i> Buscar</button>
+    <a asp-action="Index" class="btn btn-secondary btn-sm"><i class="bi bi-x-lg"></i> Limpiar</a>
+</form>
+
+<div class="card">
+    <div class="card-body" style="padding: 0;">
+        @if (Model.Any())
+        {
+            <div class="table-responsive">
+                <table class="table mb-0">
+                    <thead>
+                        <tr>
+                            <th>Producto</th>
+                            <th>Categoría</th>
+                            <th class="text-end">Precio</th>
+                            <th class="text-end">Stock</th>
+                            <th>Estado</th>
+                            <th class="text-end">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var p in Model)
+                        {
+                            <tr>
+                                <td>
+                                    <div class="fw-semibold">@p.Nombre</div>
+                                    @if (!string.IsNullOrEmpty(p.Descripcion))
+                                    {
+                                        <small class="text-muted">@p.Descripcion</small>
+                                    }
+                                </td>
+                                <td><span class="badge badge-primary">@p.Categoria.Nombre</span></td>
+                                <td class="text-end fw-bold">$@p.Precio.ToString("N2")</td>
+                                <td class="text-end">
+                                    @if (p.Stock <= 10)
+                                    {
+                                        <span class="badge badge-danger">@p.Stock</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge badge-success">@p.Stock</span>
+                                    }
+                                </td>
+                                <td>
+                                    <span class="badge @(p.Activo ? "badge-success" : "badge-danger")">
+                                        @(p.Activo ? "Activo" : "Inactivo")
+                                    </span>
+                                </td>
+                                <td class="text-end">
+                                    <a asp-action="Detalles" asp-route-id="@p.ProductoId" class="btn btn-sm btn-secondary" title="Ver detalle">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                    @if (User.IsInRole("Administrador"))
+                                    {
+                                        <a asp-action="Editar" asp-route-id="@p.ProductoId" class="btn btn-sm btn-secondary" title="Editar">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                        <form asp-action="Eliminar" asp-route-id="@p.ProductoId" method="post" style="display:inline;"
+                                              onsubmit="return confirm('¿Está seguro de eliminar este producto?');">
+                                            <button type="submit" class="btn btn-sm btn-danger" title="Eliminar">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </form>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <div class="empty-state">
+                <i class="bi bi-cup-hot"></i>
+                <h5>No se encontraron productos</h5>
+                <p>Intente cambiar los filtros o agregue un nuevo producto.</p>
+            </div>
+        }
+    </div>
+</div>

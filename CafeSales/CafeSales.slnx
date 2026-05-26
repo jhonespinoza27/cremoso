@@ -1,0 +1,7 @@
+<Solution>
+  <Project Path="CafeSales.Business/CafeSales.Business.csproj" />
+  <Project Path="CafeSales.Data/CafeSales.Data.csproj" />
+  <Project Path="CafeSales.Models/CafeSales.Models.csproj" />
+  <Project Path="CafeSales.Tests/CafeSales.Tests.csproj" />
+  <Project Path="CafeSales.Web/CafeSales.Web.csproj" />
+</Solution>
